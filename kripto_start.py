@@ -15,17 +15,19 @@ def main():
         for key, item in info.items():
             formated_informations += str(key) + ' : ' + str(item).replace('{','').replace('}','').replace("'",'').replace(',',', ').title()+'\n'
     
-        sg.popup(formated_informations,title='Informacije o BlockChain-u')
+        sg.popup(formated_informations,title='BlockChain Info')
 
-    
+
     layout_start = [
+          [sg.Image(r'img.gif')],
           [sg.Button('Blockchain Info')],
           [sg.Button('2')], 
           [sg.Button('3')], 
           [sg.Quit()]
           ]
     
-    window = sg.Window('YOUR BLOCKCHAIN').Layout(layout_start)
+    window = sg.Window('YOUR BLOCKCHAIN',layout_start,size=(500,300))
+    
     
     while True:
         event, value = window.read()
@@ -34,6 +36,7 @@ def main():
         
         elif event == 'Blockchain Info':
             blockchain_info()
+        
     
 if __name__=='__main__':
     main()
