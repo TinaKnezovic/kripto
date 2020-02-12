@@ -1,42 +1,68 @@
+
 from bitcoinrpc.authproxy import AuthServiceProxy
 import PySimpleGUI as sg
 
-def main():
-    sg.theme('DarkAmber')
-    
-    
-    CLIENT_URL= 'http://student:WYVyF5DTERJASAiIiYGg4UkRH@blockchain.oss.unist.hr:8332'
-    client=AuthServiceProxy(CLIENT_URL)
-    
-    def blockchain_info():
-        info= client.getblockchaininfo()
 
-        formated_informations = ''
+def block_stats(client, visina):
+    stats = client.getblockstats(client.getblockhash(visina))
+
+    if stats != Exception:
+        output = ''
+
+        for key, item in stats.items():
+            output += str(key) + ' : ' + str(item).replace(
+                '{', '').replace('}', '').replace("'", '').replace(',', ', ').title()+'\n'
+
+        sg.popup(output, title='Info')
+
+
+def get_block(client, visina):
+
+    info = client.getblock(client.getblockhash(visina))
+
+    if info != Exception:
+        output = ''
+
         for key, item in info.items():
-            formated_informations += str(key) + ' : ' + str(item).replace('{','').replace('}','').replace("'",'').replace(',',', ').title()+'\n'
-    
-        sg.popup(formated_informations,title='BlockChain Info')
+            output += str(key) + ' : ' + str(item).replace(
+                '{', '').replace('}', '').replace("'", '').replace(',', ', ').title()+'\n'
+
+        sg.popup(output, title='Info')
 
 
-    layout_start = [
-          [sg.Image(r'img.gif')],
-          [sg.Button('Blockchain Info')],
-          [sg.Button('2')], 
-          [sg.Button('3')], 
-          [sg.Quit()]
-          ]
-    
-    window = sg.Window('YOUR BLOCKCHAIN',layout_start,size=(500,300))
-    
-    
+def layout():
+
+    layout = [
+             
+        [sg.Image(r'img.gif'), sg.Text('Unesite visinu bloka'), sg.InputText(key='visina'), sg.Button('Get block'), sg.Button('Get stats')],
+
+    ]
+    return layout
+
+
+def main():
+
+    url = '(pristupnipodaci)'
+
+    # Connect to blockchain.oss.unist.hr
+    client = AuthServiceProxy(url)
+
+    # Create GUI window.
+    sg.change_look_and_feel('DarkAmber')
+    window = sg.Window('Block Info', layout(), size=(800, 50))
+
     while True:
-        event, value = window.read()
-        if event in (None, 'Quit'):
+        event, values = window.read()
+        if event in (None,):  # if user closes window
             break
-        
-        elif event == 'Blockchain Info':
-            blockchain_info()
-        
-    
-if __name__=='__main__':
+
+        if event == 'Get block':
+            get_block(client, int(values['visina']))
+
+        if event == 'Get stats':
+            block_stats(client, int(values['visina']))
+    window.close()
+
+
+if __name__ == '__main__':
     main()
